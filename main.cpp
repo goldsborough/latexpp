@@ -9,7 +9,7 @@ int main(int argc, const char* argv[])
 	Latex latex;
 	
 	latex.png("\\frac{1}{2} + \\pi \\cdot 2",
-			  "../../output2.png");
+			  "../../out.png");
 	
 	//std::cout << latex.html("\\frac{1}{2} + \\pi \\cdot 2") << std::endl;
 }

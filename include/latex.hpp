@@ -163,6 +163,16 @@ public:
 	
 protected:
 	
+	static struct V8
+	{
+		V8();
+		
+		~V8();
+	
+		std::unique_ptr<v8::Platform> platform;
+		
+	} v8;
+	
 	struct Allocator : public v8::ArrayBuffer::Allocator
 	{
 		virtual void* Allocate(size_t length) override;
@@ -179,8 +189,6 @@ protected:
 	virtual std::string _read_stylesheet(const std::string& path) const;
 	
 	virtual v8::Isolate* _new_isolate() const;
-	
-	virtual void _initialize_v8() const;
 	
 	virtual void _load_katex(const v8::Local<v8::Context>& context) const;
 	
@@ -201,9 +209,6 @@ protected:
 	
 	friend void _log(wkhtmltoimage_converter* converter,
 					 const char* message);
-
-	
-	std::shared_ptr<v8::Platform> _platform;
 	
 	mutable Allocator _allocator;
 
@@ -218,7 +223,6 @@ protected:
 	std::string _additional_css;
 	
 	WarningBehavior _warning_behaviour;
-	
 };
 
 #endif /* LATEX_HPP */

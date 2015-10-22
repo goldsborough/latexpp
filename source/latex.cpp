@@ -7,29 +7,18 @@
 #include <libplatform/libplatform.h>
 #include <wkhtmltox/image.h>
 
+Latex::V8 Latex::v8;
+
 Latex::Latex(WarningBehavior behavior)
-: Latex("../../katex/katex.min.css",
-		behavior)
+: Latex("../../katex/katex.min.css", behavior)
 { }
 
 Latex::Latex(const std::string& stylesheet, WarningBehavior behavior)
-: Latex(std::shared_ptr<v8::Platform>(v8::platform::CreateDefaultPlatform()),
-		stylesheet,
-		behavior)
-{ }
-
-Latex::Latex(std::shared_ptr<v8::Platform> platform,
-			 const std::string& stylesheet,
-			 WarningBehavior behavior)
-: _platform(platform)
-, _stylesheet_path(stylesheet)
+: _stylesheet_path(stylesheet)
 , _stylesheet(_read_stylesheet(stylesheet))
 , _warning_behaviour(behavior)
+, _isolate(_new_isolate())
 {
-	_initialize_v8();
-	
-	_isolate = _new_isolate();
-	
 	v8::HandleScope handle_scope(_isolate);
 	
 	v8::Isolate::Scope isolate_scope(_isolate);
@@ -46,7 +35,8 @@ Latex::Latex(std::shared_ptr<v8::Platform> platform,
 }
 
 Latex::Latex(const Latex& other)
-: Latex(other._stylesheet_path, other._warning_behaviour)
+: Latex(other._stylesheet_path,
+		other._warning_behaviour)
 {
 	_additional_css = other._additional_css;
 }
@@ -68,8 +58,6 @@ void Latex::swap(Latex &other) noexcept
 {
 	// Enable ADL
 	using std::swap;
-	
-	swap(_platform, other._platform);
 	
 	swap(_allocator, other._allocator);
 	
@@ -93,10 +81,6 @@ void swap(Latex& first, Latex& second) noexcept
 
 Latex::~Latex()
 {
-	v8::V8::Dispose();
-	
-	v8::V8::ShutdownPlatform();
-	
 	wkhtmltoimage_deinit();
 }
 
@@ -242,15 +226,6 @@ v8::Isolate* Latex::_new_isolate() const
 	return v8::Isolate::New(parameters);
 }
 
-void Latex::_initialize_v8() const
-{
-	v8::V8::InitializeICU();
-	
-	v8::V8::InitializePlatform(_platform.get());
-	
-	v8::V8::Initialize();
-}
-
 void Latex::_load_katex(const v8::Local<v8::Context>& context) const
 {
 	std::ifstream file("../../katex/katex.min.js");
@@ -387,6 +362,23 @@ Latex::_new_converter_settings(const std::string& filename,
 									 "100");
 	
 	return settings;
+}
+
+Latex::V8::V8()
+: platform(v8::platform::CreateDefaultPlatform())
+{
+	v8::V8::InitializeICU();
+	
+	v8::V8::InitializePlatform(platform.get());
+	
+	v8::V8::Initialize();
+}
+
+Latex::V8::~V8()
+{
+	v8::V8::Dispose();
+	
+	v8::V8::ShutdownPlatform();
 }
 
 void* Latex::Allocator::Allocate(size_t length)
