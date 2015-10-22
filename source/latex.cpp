@@ -84,7 +84,7 @@ Latex::~Latex()
 	wkhtmltoimage_deinit();
 }
 
-std::string Latex::html(const std::string& latex) const
+std::string Latex::to_html(const std::string& latex) const
 {
 	v8::Isolate::Scope isolate_scope(_isolate);
 	
@@ -104,14 +104,13 @@ std::string Latex::html(const std::string& latex) const
 	return *static_cast<v8::String::Utf8Value>(html);
 }
 
-std::string Latex::complete_html(const std::string &latex) const
+std::string Latex::to_complete_html(const std::string &latex) const
 {
-	auto snippet = html(latex);
+	auto snippet = to_html(latex);
 	
 	std::string html = "<!DOCTYPE html>\n<html>\n";
 	
-	html += "<head>\n<meta charset='utf-8'/>\n";
-	html += "<style>";
+	html += "<head>\n<meta charset='utf-8'/>\n<style>";
 	html += _stylesheet + _additional_css;
 	html += "</style>\n</head>\n";
 	
@@ -122,17 +121,17 @@ std::string Latex::complete_html(const std::string &latex) const
 	return html;
 }
 
-void Latex::image(const std::string &latex,
-				  const std::string &filename,
+void Latex::to_image(const std::string &latex,
+				  const std::string &filepath,
 				  ImageFormat format) const
 {
 	std::ofstream temp("temp.html");
 	
-	temp << complete_html(latex);
+	temp << to_complete_html(latex);
 	
 	temp.close();
 	
-	auto converter = _new_converter(filename, format);
+	auto converter = _new_converter(filepath, format);
 	
 	if (! wkhtmltoimage_convert(converter))
 	{
@@ -144,22 +143,22 @@ void Latex::image(const std::string &latex,
 	boost::filesystem::remove("temp.html");
 }
 
-void Latex::png(const std::string &latex,
-				const std::string &filename) const
+void Latex::to_png(const std::string &latex,
+				const std::string &filepath) const
 {
-	image(latex, filename, ImageFormat::PNG);
+	to_image(latex, filepath, ImageFormat::PNG);
 }
 
-void Latex::jpg(const std::string &latex,
-				const std::string &filename) const
+void Latex::to_jpg(const std::string &latex,
+				const std::string &filepath) const
 {
-	image(latex, filename, ImageFormat::JPG);
+	to_image(latex, filepath, ImageFormat::JPG);
 }
 
-void Latex::svg(const std::string &latex,
-				const std::string &filename) const
+void Latex::to_svg(const std::string &latex,
+				const std::string &filepath) const
 {
-	image(latex, filename, ImageFormat::SVG);
+	to_image(latex, filepath, ImageFormat::SVG);
 }
 
 void Latex::add_css(const std::string& css)
@@ -189,12 +188,12 @@ void Latex::stylesheet(const std::string& stylesheet)
 	_stylesheet = _read_stylesheet(stylesheet);
 }
 
-const Latex::WarningBehavior& Latex::exception_behavior() const
+const Latex::WarningBehavior& Latex::warning_behavior() const
 {
 	return _warning_behaviour;
 }
 
-void Latex::exception_behavior(WarningBehavior behavior)
+void Latex::warning_behavior(WarningBehavior behavior)
 {
 	_warning_behaviour = behavior;
 }
@@ -255,12 +254,14 @@ v8::Local<v8::Value> Latex::_run(const std::string& source,
 	// Compile the source code.
 	auto script = v8::Script::Compile(context, checked).ToLocalChecked();
 	
+	// V8 engine's try-catch mechanism
 	v8::TryCatch try_catch(_isolate);
 	
 	auto result = script->Run(context);
 	
 	if (result.IsEmpty())
 	{
+		// Grab last exception
 		auto exception = try_catch.Exception();
 		
 		std::string what = *static_cast<v8::String::Utf8Value>(exception);
@@ -288,21 +289,21 @@ std::string Latex::_escape(std::string source) const
 	return source;
 }
 
-void _throw(wkhtmltoimage_converter* converter, const char* message)
+void _throw(wkhtmltoimage_converter*, const char* message)
 {
 	throw Latex::ConversionException(message);
 }
 
 
-void _log(wkhtmltoimage_converter* converter, const char* message)
+void _log(wkhtmltoimage_converter*, const char* message)
 {
 	std::clog << message << std::endl;
 }
 
 wkhtmltoimage_converter*
-Latex::_new_converter(const std::string& filename, ImageFormat format) const
+Latex::_new_converter(const std::string& filepath, ImageFormat format) const
 {
-	auto settings = _new_converter_settings(filename, format);
+	auto settings = _new_converter_settings(filepath, format);
 	
 	auto converter = wkhtmltoimage_create_converter(settings, nullptr);
 	
@@ -322,7 +323,7 @@ Latex::_new_converter(const std::string& filename, ImageFormat format) const
 }
 
 wkhtmltoimage_global_settings*
-Latex::_new_converter_settings(const std::string& filename,
+Latex::_new_converter_settings(const std::string& filepath,
 					 Latex::ImageFormat format) const
 {
 	auto settings = wkhtmltoimage_create_global_settings();
@@ -337,7 +338,7 @@ Latex::_new_converter_settings(const std::string& filename,
 	
 	wkhtmltoimage_set_global_setting(settings,
 									 "out",
-									 filename.c_str());
+									 filepath.c_str());
 	const char* fmt;
 	
 	switch (format)
