@@ -182,10 +182,6 @@ protected:
 		virtual void Free(void* data, size_t) override;
 	};
 	
-	Latex(std::shared_ptr<v8::Platform> platform,
-		  const std::string& stylesheet_path,
-		  WarningBehavior behavior);
-	
 	virtual std::string _read_stylesheet(const std::string& path) const;
 	
 	virtual v8::Isolate* _new_isolate() const;
