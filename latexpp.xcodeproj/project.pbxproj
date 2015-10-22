@@ -15,6 +15,9 @@
 		7A1FFCEE1BD7E9E800FD092F /* libv8_libplatform.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A1FFCEB1BD7E9E800FD092F /* libv8_libplatform.a */; };
 		7A1FFCF11BD7EA0000FD092F /* libv8_nosnapshot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A1FFCEF1BD7EA0000FD092F /* libv8_nosnapshot.a */; };
 		7A1FFCF21BD7EA0000FD092F /* libv8_snapshot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A1FFCF01BD7EA0000FD092F /* libv8_snapshot.a */; };
+		7A1FFD821BD9285100FD092F /* libwkhtmltox.0.12.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A1FFD801BD90CC000FD092F /* libwkhtmltox.0.12.2.dylib */; };
+		7A1FFD841BD9358D00FD092F /* libboost_filesystem.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A1FFD831BD9358D00FD092F /* libboost_filesystem.dylib */; };
+		7A1FFD861BD9363300FD092F /* libboost_system.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A1FFD851BD9363300FD092F /* libboost_system.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -40,6 +43,9 @@
 		7A1FFCEB1BD7E9E800FD092F /* libv8_libplatform.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libv8_libplatform.a; path = ../../../../../usr/local/Cellar/v8/4.5.103.35/lib/libv8_libplatform.a; sourceTree = "<group>"; };
 		7A1FFCEF1BD7EA0000FD092F /* libv8_nosnapshot.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libv8_nosnapshot.a; path = ../../../../../usr/local/Cellar/v8/4.5.103.35/lib/libv8_nosnapshot.a; sourceTree = "<group>"; };
 		7A1FFCF01BD7EA0000FD092F /* libv8_snapshot.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libv8_snapshot.a; path = ../../../../../usr/local/Cellar/v8/4.5.103.35/lib/libv8_snapshot.a; sourceTree = "<group>"; };
+		7A1FFD801BD90CC000FD092F /* libwkhtmltox.0.12.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libwkhtmltox.0.12.2.dylib; path = ../../../../../usr/local/lib/libwkhtmltox.0.12.2.dylib; sourceTree = "<group>"; };
+		7A1FFD831BD9358D00FD092F /* libboost_filesystem.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_filesystem.dylib; path = ../../../../../usr/local/Cellar/boost/1.58.0/lib/libboost_filesystem.dylib; sourceTree = "<group>"; };
+		7A1FFD851BD9363300FD092F /* libboost_system.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_system.dylib; path = ../../../../../usr/local/Cellar/boost/1.58.0/lib/libboost_system.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +53,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A1FFD861BD9363300FD092F /* libboost_system.dylib in Frameworks */,
+				7A1FFD841BD9358D00FD092F /* libboost_filesystem.dylib in Frameworks */,
+				7A1FFD821BD9285100FD092F /* libwkhtmltox.0.12.2.dylib in Frameworks */,
 				7A1FFCF11BD7EA0000FD092F /* libv8_nosnapshot.a in Frameworks */,
 				7A1FFCF21BD7EA0000FD092F /* libv8_snapshot.a in Frameworks */,
 				7A1FFCEC1BD7E9E800FD092F /* libv8_base.a in Frameworks */,
@@ -62,6 +71,9 @@
 		7A1FFCCB1BD7E69900FD092F = {
 			isa = PBXGroup;
 			children = (
+				7A1FFD851BD9363300FD092F /* libboost_system.dylib */,
+				7A1FFD831BD9358D00FD092F /* libboost_filesystem.dylib */,
+				7A1FFD801BD90CC000FD092F /* libwkhtmltox.0.12.2.dylib */,
 				7A1FFCEF1BD7EA0000FD092F /* libv8_nosnapshot.a */,
 				7A1FFCF01BD7EA0000FD092F /* libv8_snapshot.a */,
 				7A1FFCE91BD7E9E800FD092F /* libv8_base.a */,
@@ -246,10 +258,16 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				HEADER_SEARCH_PATHS = "/usr/local/Cellar/v8/4.5.103.35/**";
+				HEADER_SEARCH_PATHS = (
+					"/usr/local/Cellar/v8/4.5.103.35/**",
+					/usr/local/include,
+					/usr/local/Cellar/boost/include,
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/local/Cellar/v8/4.5.103.35/lib,
+					/usr/local/lib,
+					/usr/local/Cellar/boost/1.58.0/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -260,10 +278,16 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
-				HEADER_SEARCH_PATHS = "/usr/local/Cellar/v8/4.5.103.35/**";
+				HEADER_SEARCH_PATHS = (
+					"/usr/local/Cellar/v8/4.5.103.35/**",
+					/usr/local/include,
+					/usr/local/Cellar/boost/include,
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/local/Cellar/v8/4.5.103.35/lib,
+					/usr/local/lib,
+					/usr/local/Cellar/boost/1.58.0/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -288,6 +312,7 @@
 				7A1FFCDD1BD7E69900FD092F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

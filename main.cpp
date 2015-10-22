@@ -4,7 +4,12 @@
 
 int main(int argc, const char* argv[])
 {
+	Latex a;
+	
 	Latex latex;
 	
-	std::cout << latex.render("\\frac{1}{2}") << std::endl;
+	latex.png("\\frac{1}{2} + \\pi \\cdot 2",
+			  "../../output2.png");
+	
+	//std::cout << latex.html("\\frac{1}{2} + \\pi \\cdot 2") << std::endl;
 }

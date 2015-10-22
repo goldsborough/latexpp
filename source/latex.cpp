@@ -1,11 +1,30 @@
 #include "latex.hpp"
 
+#include <boost/filesystem.hpp>
 #include <cstdlib>
 #include <fstream>
+#include <iostream>
 #include <libplatform/libplatform.h>
+#include <wkhtmltox/image.h>
 
-Latex::Latex()
-: _platform(v8::platform::CreateDefaultPlatform())
+Latex::Latex(WarningBehavior behavior)
+: Latex("../../katex/katex.min.css",
+		behavior)
+{ }
+
+Latex::Latex(const std::string& stylesheet, WarningBehavior behavior)
+: Latex(std::shared_ptr<v8::Platform>(v8::platform::CreateDefaultPlatform()),
+		stylesheet,
+		behavior)
+{ }
+
+Latex::Latex(std::shared_ptr<v8::Platform> platform,
+			 const std::string& stylesheet,
+			 WarningBehavior behavior)
+: _platform(platform)
+, _stylesheet_path(stylesheet)
+, _stylesheet(_read_stylesheet(stylesheet))
+, _warning_behaviour(behavior)
 {
 	_initialize_v8();
 	
@@ -22,13 +41,14 @@ Latex::Latex()
 	_load_katex(context);
 	
 	_persistent_context = v8::UniquePersistent<v8::Context>(_isolate, context);
+	
+	wkhtmltoimage_init(false);
 }
 
 Latex::Latex(const Latex& other)
-: _platform(v8::platform::CreateDefaultPlatform())
-, _allocator(other._allocator)
+: Latex(other._stylesheet_path, other._warning_behaviour)
 {
-	_initialize_v8();
+	_additional_css = other._additional_css;
 }
 
 Latex::Latex(Latex&& other) noexcept
@@ -52,6 +72,18 @@ void Latex::swap(Latex &other) noexcept
 	swap(_platform, other._platform);
 	
 	swap(_allocator, other._allocator);
+	
+	swap(_isolate, other._isolate);
+	
+	swap(_persistent_context, other._persistent_context);
+	
+	swap(_stylesheet_path, other._stylesheet_path);
+	
+	swap(_stylesheet, other._stylesheet);
+	
+	swap(_additional_css, other._additional_css);
+	
+	swap(_warning_behaviour, other._warning_behaviour);
 }
 
 void swap(Latex& first, Latex& second) noexcept
@@ -64,9 +96,11 @@ Latex::~Latex()
 	v8::V8::Dispose();
 	
 	v8::V8::ShutdownPlatform();
+	
+	wkhtmltoimage_deinit();
 }
 
-std::string Latex::render(const std::string& latex) const
+std::string Latex::html(const std::string& latex) const
 {
 	v8::Isolate::Scope isolate_scope(_isolate);
 	
@@ -84,6 +118,128 @@ std::string Latex::render(const std::string& latex) const
 	auto html = _run(source, context);
 	
 	return *static_cast<v8::String::Utf8Value>(html);
+}
+
+std::string Latex::complete_html(const std::string &latex) const
+{
+	auto snippet = html(latex);
+	
+	std::string html = "<!DOCTYPE html>\n<html>\n";
+	
+	html += "<head>\n<meta charset='utf-8'/>\n";
+	html += "<style>";
+	html += _stylesheet + _additional_css;
+	html += "</style>\n</head>\n";
+	
+	html += "<body>\n";
+	html += snippet;
+	html += "\n</body>\n</html>";
+	
+	return html;
+}
+
+void Latex::image(const std::string &latex,
+				  const std::string &filename,
+				  ImageFormat format) const
+{
+	std::ofstream temp("temp.html");
+	
+	temp << complete_html(latex);
+	
+	temp.close();
+	
+	auto converter = _new_converter(filename, format);
+	
+	if (! wkhtmltoimage_convert(converter))
+	{
+		throw ConversionException("Could not convert to png!");
+	}
+	
+	wkhtmltoimage_destroy_converter(converter);
+	
+	boost::filesystem::remove("temp.html");
+}
+
+void Latex::png(const std::string &latex,
+				const std::string &filename) const
+{
+	image(latex, filename, ImageFormat::PNG);
+}
+
+void Latex::jpg(const std::string &latex,
+				const std::string &filename) const
+{
+	image(latex, filename, ImageFormat::JPG);
+}
+
+void Latex::svg(const std::string &latex,
+				const std::string &filename) const
+{
+	image(latex, filename, ImageFormat::SVG);
+}
+
+void Latex::add_css(const std::string& css)
+{
+	_additional_css += css;
+}
+
+const std::string& Latex::additional_css() const
+{
+	return _additional_css;
+}
+
+void Latex::clear_additional_css()
+{
+	_additional_css.clear();
+}
+
+const std::string& Latex::stylesheet() const
+{
+	return _stylesheet_path;
+}
+
+void Latex::stylesheet(const std::string& stylesheet)
+{
+	_stylesheet_path = stylesheet;
+	
+	_stylesheet = _read_stylesheet(stylesheet);
+}
+
+const Latex::WarningBehavior& Latex::exception_behavior() const
+{
+	return _warning_behaviour;
+}
+
+void Latex::exception_behavior(WarningBehavior behavior)
+{
+	_warning_behaviour = behavior;
+}
+
+std::string Latex::_read_stylesheet(const std::string &path) const
+{
+	std::ifstream file(path);
+	
+	if (! file) throw FileException("Could not read stylesheet!");
+	
+	std::string stylesheet;
+	std::string input;
+	
+	while (std::getline(file, input))
+	{
+		stylesheet += input + "\n";
+	}
+	
+	return stylesheet;
+}
+
+v8::Isolate* Latex::_new_isolate() const
+{
+	v8::Isolate::CreateParams parameters;
+	
+	parameters.array_buffer_allocator = &_allocator;
+	
+	// Isolated JavaScript Virtual Environment
+	return v8::Isolate::New(parameters);
 }
 
 void Latex::_initialize_v8() const
@@ -157,21 +313,87 @@ std::string Latex::_escape(std::string source) const
 	return source;
 }
 
-v8::Isolate* Latex::_new_isolate() const
+void _throw(wkhtmltoimage_converter* converter, const char* message)
 {
-	v8::Isolate::CreateParams parameters;
+	throw Latex::ConversionException(message);
+}
+
+
+void _log(wkhtmltoimage_converter* converter, const char* message)
+{
+	std::clog << message << std::endl;
+}
+
+wkhtmltoimage_converter*
+Latex::_new_converter(const std::string& filename, ImageFormat format) const
+{
+	auto settings = _new_converter_settings(filename, format);
 	
-	parameters.array_buffer_allocator = &_allocator;
+	auto converter = wkhtmltoimage_create_converter(settings, nullptr);
 	
-	// Isolated JavaScript Virtual Environment
-	return v8::Isolate::New(parameters);
+	wkhtmltoimage_set_error_callback(converter, _throw);
+	
+	if (_warning_behaviour == WarningBehavior::Strict)
+	{
+		wkhtmltoimage_set_error_callback(converter, _throw);
+	}
+	
+	else if (_warning_behaviour == WarningBehavior::Log)
+	{
+		wkhtmltoimage_set_warning_callback(converter, _log);
+	}
+	
+	return converter;
+}
+
+wkhtmltoimage_global_settings*
+Latex::_new_converter_settings(const std::string& filename,
+					 Latex::ImageFormat format) const
+{
+	auto settings = wkhtmltoimage_create_global_settings();
+	
+	wkhtmltoimage_set_global_setting(settings,
+									 "transparent",
+									 "false");
+	
+	wkhtmltoimage_set_global_setting(settings,
+									 "in",
+									 "temp.html");
+	
+	wkhtmltoimage_set_global_setting(settings,
+									 "out",
+									 filename.c_str());
+	const char* fmt;
+	
+	switch (format)
+	{
+		case ImageFormat::PNG: fmt = "png"; break;
+			
+		case ImageFormat::JPG: fmt = "jpg"; break;
+			
+		case ImageFormat::SVG: fmt = "svg"; break;
+	}
+	
+	wkhtmltoimage_set_global_setting(settings,
+									 "fmt",
+									 fmt);
+	
+	wkhtmltoimage_set_global_setting(settings,
+									 "screenWidth",
+									 "0");
+	
+	wkhtmltoimage_set_global_setting(settings,
+									 "quality",
+									 "100");
+	
+	return settings;
 }
 
 void* Latex::Allocator::Allocate(size_t length)
 {
 	auto data = AllocateUninitialized(length);
 	
-	return data ? memset(data, 0, length) : data;
+	return data ? std::memset(data, 0, length) : data;
 }
 
 void Latex::Allocator::Free(void *data, size_t)
