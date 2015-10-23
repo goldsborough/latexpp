@@ -1,9 +1,5 @@
 # latexpp
 
-<a href="http://goldsborough.mit-license.org"><img src="https://img.shields.io/github/license/mashape/apistatus.png"></a>
-
-
-
 *latexpp* is a first-of-its kind C++ library for generating `LaTeX` equations via C++. It supports conversion of `LaTeX` equations to HTML as well as JPG, PNG and SVG image formats.
 
 ## Usage
