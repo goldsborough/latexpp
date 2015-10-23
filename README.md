@@ -26,6 +26,18 @@ int main(int argc, const char* argv[])
 
 ![equation.png](https://raw.githubusercontent.com/goldsborough/latexpp/master/docs/img/equation.png)
 
+## Implementation Overview
+
+*latexpp* uses [`KaTeX`](https://khan.github.io/KaTeX/) to render `LaTeX` to HTML. Because `KaTeX` is a JavaScript library, *latexpp* uses [Google's V8 engine](https://github.com/v8/v8) to write JavaScript from C++. Image output is enabled by the [wkhtmltox](http://wkhtmltopdf.org) C library.
+
+To build this project, you will need:
+
+* The [Google V8 engine](https://github.com/v8/v8) to compile JavaScript.
+* The [wkhtmltox](http://wkhtmltopdf.org) library for image output.
+* [Boost](http://www.boost.org) for some cross-platform directory operations (can be dropped as a dependency if platform-indpendence is not required, or when the C++ standard committee decides to roll out boost's filesystem library in the C++ standard library.)
+
+`KaTeX` is not a dependency as it is entirely contained in the `katex` folder.
+
 ## Documentation
 
 You can build extensive documentation with `doxygen`. See the `doxyfile` in the `docs/` folder. There are also some example programs in the `examples` folder.
@@ -36,6 +48,6 @@ This project is released under the [MIT License](http://goldsborough.mit-license
 
 ## Authors
 
-Peter Goldsborough + [cat](https://goo.gl/IpUmJn) :heart:
+[Peter Goldsborough](http://goldsborough.me) + [cat](https://goo.gl/IpUmJn) :heart:
 
 <a href="https://gratipay.com/~goldsborough/"><img src="http://img.shields.io/gratipay/goldsborough.png?style=flat-square"></a>
