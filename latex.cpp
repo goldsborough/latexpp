@@ -128,9 +128,11 @@ std::string Latex::to_html(const std::string& latex) const
 	source += _escape(latex) + "', ";
 	source += arguments + ");";
 	
-	auto html = _run(source, context);
+	auto value = _run(source, context);
 	
-	return *static_cast<v8::String::Utf8Value>(html);
+	std::string html = *static_cast<v8::String::Utf8Value>(value);
+	
+	return "<div class='latex'>\n" + html + "</div>\n";
 }
 
 std::string Latex::to_complete_html(const std::string &latex) const
@@ -145,14 +147,14 @@ std::string Latex::to_complete_html(const std::string &latex) const
 	
 	if (! _additional_css.empty())
 	{
-		html += "<style>";
+		html += "<style>\n";
 		html += _additional_css;
 		html += "</style>\n";
 	}
 	
 	html += "</head>\n<body>\n";
 	html += snippet;
-	html += "\n</body>\n</html>";
+	html += "</body>\n</html>";
 	
 	return html;
 }
