@@ -21,6 +21,9 @@ class Latex
 {
 public:
 	
+	/*! The path to the KaTeX directory. */
+	static std::string _katex_path;
+	
 	/***********************************************************************//*!
 	*
 	*	@brief The available image formats.
@@ -116,8 +119,8 @@ public:
 	*
 	*	@brief Constructs a Latex instance.
 	*
-	*	@param stylesheet_path The file-path of the CSS stylesheet to use
-	*				       	   for styling the KaTeX HTML output.
+	*	@param stylesheet The file-path of the CSS stylesheet to use
+	*				      for styling the KaTeX HTML output.
 	*
 	*	@param behavior The warning behavior to use.
 	*
@@ -125,7 +128,7 @@ public:
 	*
 	***************************************************************************/
 	
-	Latex(const std::string& stylesheet_path,
+	Latex(const std::string& stylesheet,
 		  WarningBehavior behavior = WarningBehavior::Log);
 	
 	/***********************************************************************//*!
@@ -245,6 +248,8 @@ public:
 	*	@throws ConversionException If the conversion of the latex snippet
 	*							    to an image failed.
 	*
+    *	@throws FileException If a temporary helper file could not be opened.
+    *
 	***************************************************************************/
 	
 	virtual void to_image(const std::string& latex,
@@ -266,6 +271,8 @@ public:
 	*	@throws ConversionException If the conversion of the latex snippet
 	*							    to an image failed.
 	*
+	*	@throws FileException If a temporary helper file could not be opened.
+	*
 	***************************************************************************/
 	
 	virtual void to_png(const std::string& latex,
@@ -286,6 +293,8 @@ public:
 	*	@throws ConversionException If the conversion of the latex snippet
 	*							    to an image failed.
 	*
+	*	@throws FileException If a temporary helper file could not be opened.
+	*
 	***************************************************************************/
 	
 	virtual void to_jpg(const std::string& latex,
@@ -305,6 +314,8 @@ public:
 	*
 	*	@throws ConversionException If the conversion of the latex snippet
 	*							    to an image failed.
+	*
+	*	@throws FileException If a temporary helper file could not be opened.
 	*
 	***************************************************************************/
 	
@@ -346,61 +357,27 @@ public:
 	***************************************************************************/
 	
 	virtual void clear_additional_css();
-	
+
 	/***********************************************************************//*!
 	*
-	*	@brief Returns the base-stylesheet.
+	*	@brief Returns the path to the stylesheet being used.
 	*
 	***************************************************************************/
 	
 	virtual const std::string& stylesheet() const;
-	
-	/***********************************************************************//*!
-	*
-	*	@brief Sets the base-stylesheet to the given string.
-	*
-	*	@details Note that you will seldom want to change the base-stylesheet.
-	*			 If you want to add a tiny bit of CSS, use add_css(). Note
-	*			 also that this will make the stylesheet-path an empty string.
-	*
-	*	@param stylesheet A string containing the CSS.
-	*
-    *	@see stylesheet_path()
-    *
-	***************************************************************************/
-	
-	virtual void stylesheet(const std::string& stylesheet);
-
-	/***********************************************************************//*!
-	*
-	*	@brief Returns the path to the stylesheet being used, if set.
-	*
-	*	@details Note that this will be an empty string if you set the
-    *			 stylesheet directly as a string, via
-    *			 stylesheet(const std::string&)
-	*
-    *	@return The path set via the constructor or
-    *		    stylesheet_path(const std::string&), or an empty string if
-    *			stylesheet was set directly via stylesheet(const std::string&).
-    *
-	***************************************************************************/
-	
-	virtual const std::string& stylesheet_path() const;
 
 	/***********************************************************************//*!
 	*
 	*	@brief Sets the base-stylesheet from a given path.
 	*
 	*	@details Note that you will seldom want to change the base-stylesheet.
-	*			 If you want to add a tiny bit of CSS, use add_css().
+	*			 If you want to add some additional bit of CSS, use add_css().
 	*
 	*	@param path A path to a CSS stylesheet to load.
 	*
-	*	@see stylesheet(const std::string&)
-	*
 	***************************************************************************/
 	
-	virtual void stylesheet_path(const std::string& path);
+	virtual void stylesheet(const std::string& path);
 	
 	/***********************************************************************//*!
 	*
@@ -425,9 +402,6 @@ public:
 	
 	
 protected:
-	
-	/*! The path to the KaTeX directory. */
-	static const std::string _katex_path;
 
 	/***********************************************************************//*!
 	*
@@ -491,20 +465,7 @@ protected:
 		
 		virtual void Free(void* data, size_t) override;
 	};
-	
-	/***********************************************************************//*!
-	*
-	*	@brief Reads a stylesheet from a path and returns its contents.
-	*
-	*	@param path A valid file-path (relative or absolute).
-	*
-	*	@return The contents of the stylesheet.
-	*
-	*	@throws FileException in case of faulty file-opening
-	*
-	***************************************************************************/
-	
-	virtual std::string _read_stylesheet(const std::string& path) const;
+
 	
 	/***********************************************************************//*!
 	*
@@ -630,9 +591,6 @@ protected:
 	   to the context in which the instance interacts
 	   with the V8 engine. */
 	v8::UniquePersistent<v8::Context> _persistent_context;
-	
-	/*! The path to the base stylesheet. */
-	std::string _stylesheet_path;
 	
 	/*! The content of the base stylesheet. */
 	std::string _stylesheet;

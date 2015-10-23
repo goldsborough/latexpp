@@ -26,7 +26,7 @@ std::string Latex::_find_katex_path()
 	throw ExistentialException("Could not find KaTeX directory!");
 }
 
-const std::string Latex::_katex_path = _find_katex_path();
+std::string Latex::_katex_path;
 
 Latex::V8 Latex::v8;
 
@@ -34,12 +34,16 @@ Latex::Latex(WarningBehavior behavior)
 : Latex("../../katex/katex.min.css", behavior)
 { }
 
-Latex::Latex(const std::string& stylesheet_path, WarningBehavior behavior)
-: _stylesheet_path(stylesheet_path)
-, _stylesheet(_read_stylesheet(stylesheet_path))
+Latex::Latex(const std::string& stylesheet, WarningBehavior behavior)
+: _stylesheet(stylesheet)
 , _warning_behaviour(behavior)
 , _isolate(_new_isolate())
 {
+	if (_katex_path.empty())
+	{
+		_katex_path = _find_katex_path();
+	}
+	
 	v8::HandleScope handle_scope(_isolate);
 	
 	v8::Isolate::Scope isolate_scope(_isolate);
@@ -56,7 +60,7 @@ Latex::Latex(const std::string& stylesheet_path, WarningBehavior behavior)
 }
 
 Latex::Latex(const Latex& other)
-: Latex(other._stylesheet_path,
+: Latex(other._stylesheet,
 		other._warning_behaviour)
 {
 	_additional_css = other._additional_css;
@@ -86,8 +90,6 @@ void Latex::swap(Latex &other) noexcept
 	
 	swap(_persistent_context, other._persistent_context);
 	
-	swap(_stylesheet_path, other._stylesheet_path);
-	
 	swap(_stylesheet, other._stylesheet);
 	
 	swap(_additional_css, other._additional_css);
@@ -107,6 +109,8 @@ Latex::~Latex()
 
 std::string Latex::to_html(const std::string& latex) const
 {
+	static const std::string arguments = "{'displayMode': true}";
+	
 	v8::Isolate::Scope isolate_scope(_isolate);
 	
 	// Stack-allocated handle-scope (takes care of handles such
@@ -114,11 +118,15 @@ std::string Latex::to_html(const std::string& latex) const
 	v8::HandleScope handle_scope(_isolate);
 	
 	// Get a local context handle from the persistent handle.
-	auto context = v8::Local<v8::Context>::New(_isolate, _persistent_context);
+	auto context = v8::Local<v8::Context>::New(_isolate,
+											   _persistent_context);
 	
 	v8::Context::Scope context_scope(context);
 	
-	auto source = "katex.renderToString('" + _escape(latex) + "');";
+	std::string source = "katex.renderToString('";
+	
+	source += _escape(latex) + "', ";
+	source += arguments + ");";
 	
 	auto html = _run(source, context);
 	
@@ -131,11 +139,18 @@ std::string Latex::to_complete_html(const std::string &latex) const
 	
 	std::string html = "<!DOCTYPE html>\n<html>\n";
 	
-	html += "<head>\n<meta charset='utf-8'/>\n<style>";
-	html += _stylesheet + _additional_css;
-	html += "</style>\n</head>\n";
+	html += "<head>\n<meta charset='utf-8'/>\n";
+	html += "<link rel='stylesheet' type='text/css' ";
+ 	html += "href='" + _stylesheet + "'>\n";
 	
-	html += "<body>\n";
+	if (! _additional_css.empty())
+	{
+		html += "<style>";
+		html += _additional_css;
+		html += "</style>\n";
+	}
+	
+	html += "</head>\n<body>\n";
 	html += snippet;
 	html += "\n</body>\n</html>";
 	
@@ -147,6 +162,8 @@ void Latex::to_image(const std::string &latex,
 				  ImageFormat format) const
 {
 	std::ofstream temp("temp.html");
+	
+	if (! temp) throw FileException("Could not open temporary file!");
 	
 	temp << to_complete_html(latex);
 	
@@ -204,21 +221,7 @@ const std::string& Latex::stylesheet() const
 
 void Latex::stylesheet(const std::string& stylesheet)
 {
-	_stylesheet_path.clear();
-	
 	_stylesheet = stylesheet;
-}
-
-const std::string& Latex::stylesheet_path() const
-{
-	return _stylesheet_path;
-}
-
-void Latex::stylesheet_path(const std::string& path)
-{
-	_stylesheet = _read_stylesheet(path);
-	
-	_stylesheet_path = path;
 }
 
 const Latex::WarningBehavior& Latex::warning_behavior() const
@@ -229,23 +232,6 @@ const Latex::WarningBehavior& Latex::warning_behavior() const
 void Latex::warning_behavior(WarningBehavior behavior)
 {
 	_warning_behaviour = behavior;
-}
-
-std::string Latex::_read_stylesheet(const std::string &path) const
-{
-	std::ifstream file(path);
-	
-	if (! file) throw FileException("Could not read stylesheet!");
-	
-	std::string stylesheet;
-	std::string input;
-	
-	while (std::getline(file, input))
-	{
-		stylesheet += input + "\n";
-	}
-	
-	return stylesheet;
 }
 
 v8::Isolate* Latex::_new_isolate() const
