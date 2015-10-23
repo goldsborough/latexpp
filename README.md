@@ -24,7 +24,7 @@ int main(int argc, const char* argv[])
 
 `equation.png`:
 
-![equation.png](docs/img/equation.png)
+![equation.png](https://raw.githubusercontent.com/goldsborough/latexpp/master/docs/img/equation.png)
 
 ## Documentation
 
