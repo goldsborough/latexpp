@@ -1,5 +1,9 @@
 # latexpp
 
+<a href="http://goldsborough.mit-license.org"><img src="https://img.shields.io/github/license/mashape/apistatus.png"></a>
+
+
+
 *latexpp* is a first-of-its kind C++ library for generating `LaTeX` equations via C++. It supports conversion of `LaTeX` equations to HTML as well as JPG, PNG and SVG image formats.
 
 ## Usage
@@ -30,8 +34,12 @@ int main(int argc, const char* argv[])
 
 You can build extensive documentation with `doxygen`. See the `doxyfile` in the `docs/` folder. There are also some example programs in the `examples` folder.
 
+## LICENSE
+
+This project is released under the [MIT License](http://goldsborough.mit-license.org). For more information, see the LICENSE file.
+
 ## Authors
 
 Peter Goldsborough + [cat](https://goo.gl/IpUmJn) :heart:
 
-<a href="http://img.shields.io/gratipay/goldsborough.png?style=flat-square" target="https://gratipay.com/~goldsborough/">
+<a href="https://gratipay.com/~goldsborough/"><img src="http://img.shields.io/gratipay/goldsborough.png?style=flat-square"></a>
