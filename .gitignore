@@ -124,6 +124,12 @@ xcuserdata
 *.xccheckout
 *.moved-aside
 *.xcuserstate
+
+## Images
 *.png
 *.jpg
 *.svg
+
+## Docs
+html/
+latex/

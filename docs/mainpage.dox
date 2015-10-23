@@ -1,0 +1,28 @@
+@mainpage latexpp
+
+# latexpp
+
+*latexpp* is a first-of-its kind C++ library for generating `LaTeX` equations via C++. It supports conversion of `LaTeX` equations to HTML as well as JPG, PNG and SVG image formats.
+
+## Basic Usage
+
+\code{.cpp}
+#include "latex.hpp"
+
+int main(int argc, const char* argv[])
+{
+	// Single class
+	Latex latex;
+
+	// Be careful with the backslashes, they need to be escaped
+	const std::string equation = "\\sum_{i=1}^{N} i = \\frac{n(n + 1)}{2}";
+
+	// Convert to PNG, store in 'equation.png'
+	latex.to_png(equation, "equation.png");
+
+	// Convert to HTML, returns a HTML snippet
+	std::string html = latex.to_html(equation);
+}
+\endcode
+
+Visit the repository on [GitHub](https://github.com/goldsborough/latexpp) for more information.
