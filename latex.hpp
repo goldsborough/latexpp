@@ -100,8 +100,8 @@ public:
 	*
 	*	@brief Constructs a Latex instance.
 	*
-	*	@param stylesheet The file-path of the CSS stylesheet to use
-	*				      for styling the KaTeX HTML output.
+	*	@param stylesheet_path The file-path of the CSS stylesheet to use
+	*				       	   for styling the KaTeX HTML output.
 	*
 	*	@param behavior The warning behavior to use.
 	*
@@ -109,7 +109,7 @@ public:
 	*
 	***************************************************************************/
 	
-	Latex(const std::string& stylesheet,
+	Latex(const std::string& stylesheet_path,
 		  WarningBehavior behavior = WarningBehavior::Log);
 	
 	/***********************************************************************//*!
@@ -333,7 +333,7 @@ public:
 	
 	/***********************************************************************//*!
 	*
-	*	@brief Returnst the base-stylesheet.
+	*	@brief Returns the base-stylesheet.
 	*
 	***************************************************************************/
 	
@@ -341,16 +341,50 @@ public:
 	
 	/***********************************************************************//*!
 	*
-	*	@brief Sets the base-stylesheet from a given path.
+	*	@brief Sets the base-stylesheet to the given string.
 	*
 	*	@details Note that you will seldom want to change the base-stylesheet.
-	*			 If you want to add a tiny bit of CSS, use add_css();
+	*			 If you want to add a tiny bit of CSS, use add_css(). Note
+	*			 also that this will make the stylesheet-path an empty string.
 	*
-	*	@param stylesheet A path to a CSS stylesheet to load.
+	*	@param stylesheet A string containing the CSS.
 	*
+    *	@see stylesheet_path()
+    *
 	***************************************************************************/
 	
 	virtual void stylesheet(const std::string& stylesheet);
+
+	/***********************************************************************//*!
+	*
+	*	@brief Returns the path to the stylesheet being used, if set.
+	*
+	*	@details Note that this will be an empty string if you set the
+    *			 stylesheet directly as a string, via
+    *			 stylesheet(const std::string&)
+	*
+    *	@return The path set via the constructor or
+    *		    stylesheet_path(const std::string&), or an empty string if
+    *			stylesheet was set directly via stylesheet(const std::string&).
+    *
+	***************************************************************************/
+	
+	virtual const std::string& stylesheet_path() const;
+
+	/***********************************************************************//*!
+	*
+	*	@brief Sets the base-stylesheet from a given path.
+	*
+	*	@details Note that you will seldom want to change the base-stylesheet.
+	*			 If you want to add a tiny bit of CSS, use add_css().
+	*
+	*	@param path A path to a CSS stylesheet to load.
+	*
+	*	@see stylesheet(const std::string&)
+	*
+	***************************************************************************/
+	
+	virtual void stylesheet_path(const std::string& path);
 	
 	/***********************************************************************//*!
 	*
@@ -375,6 +409,19 @@ public:
 	
 	
 protected:
+	
+	/*! The path to the KaTeX directory. */
+	static const std::string _katex_path;
+
+	/***********************************************************************//*!
+	*
+	*	@brief Attempts to find the KaTeX directory.
+	*
+	*	@throws ExistentialException if the 
+	*
+	***************************************************************************/
+	
+	static std::string _find_katex_path();
 	
 	/***********************************************************************//*!
 	*
@@ -555,27 +602,27 @@ protected:
 	
 	friend void _log(wkhtmltoimage_converter*, const char* message);
 	
-	/* A instance of the Allocator struct for the V8 engine. */
+	/*! A instance of the Allocator struct for the V8 engine. */
 	mutable Allocator _allocator;
 
-	/* The virtual environment in which the V8 runs. */
+	/*! The virtual environment in which the V8 runs. */
 	v8::Isolate* _isolate;
 	
-	/* A persistent (i.e. non-expiring/global) handle
+	/*! A persistent (i.e. non-expiring/global) handle
 	   to the context in which the instance interacts
 	   with the V8 engine. */
 	v8::UniquePersistent<v8::Context> _persistent_context;
 	
-	/* The path to the base stylesheet. */
+	/*! The path to the base stylesheet. */
 	std::string _stylesheet_path;
 	
-	/* The content of the base stylesheet. */
+	/*! The content of the base stylesheet. */
 	std::string _stylesheet;
 	
-	/* The additional CSS added via add_css(). */
+	/*! The additional CSS added via add_css(). */
 	std::string _additional_css;
 	
-	/* The current WarningBehavior configuration. */
+	/*! The current WarningBehavior configuration. */
 	WarningBehavior _warning_behaviour;
 };
 

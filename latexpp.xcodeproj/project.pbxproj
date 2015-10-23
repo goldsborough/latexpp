@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		7A1FFCDF1BD7E6BD00FD092F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A1FFCDE1BD7E6BD00FD092F /* main.cpp */; settings = {ASSET_TAGS = (); }; };
-		7A1FFCE51BD7E70500FD092F /* latex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A1FFCE41BD7E70500FD092F /* latex.cpp */; settings = {ASSET_TAGS = (); }; };
 		7A1FFCE81BD7E82E00FD092F /* libv8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A1FFCE71BD7E82E00FD092F /* libv8.dylib */; };
 		7A1FFCEC1BD7E9E800FD092F /* libv8_base.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A1FFCE91BD7E9E800FD092F /* libv8_base.a */; };
 		7A1FFCED1BD7E9E800FD092F /* libv8_libbase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A1FFCEA1BD7E9E800FD092F /* libv8_libbase.a */; };
@@ -18,6 +17,7 @@
 		7A1FFD821BD9285100FD092F /* libwkhtmltox.0.12.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A1FFD801BD90CC000FD092F /* libwkhtmltox.0.12.2.dylib */; };
 		7A1FFD841BD9358D00FD092F /* libboost_filesystem.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A1FFD831BD9358D00FD092F /* libboost_filesystem.dylib */; };
 		7A1FFD861BD9363300FD092F /* libboost_system.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A1FFD851BD9363300FD092F /* libboost_system.dylib */; };
+		7A1FFD891BD9ADC100FD092F /* latex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A1FFD871BD9ADC100FD092F /* latex.cpp */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -35,8 +35,6 @@
 /* Begin PBXFileReference section */
 		7A1FFCD41BD7E69900FD092F /* latexpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = latexpp; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A1FFCDE1BD7E6BD00FD092F /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		7A1FFCE41BD7E70500FD092F /* latex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = latex.cpp; sourceTree = "<group>"; };
-		7A1FFCE61BD7E71000FD092F /* latex.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = latex.hpp; sourceTree = "<group>"; };
 		7A1FFCE71BD7E82E00FD092F /* libv8.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libv8.dylib; path = ../../../../../usr/local/Cellar/v8/4.5.103.35/lib/libv8.dylib; sourceTree = "<group>"; };
 		7A1FFCE91BD7E9E800FD092F /* libv8_base.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libv8_base.a; path = ../../../../../usr/local/Cellar/v8/4.5.103.35/lib/libv8_base.a; sourceTree = "<group>"; };
 		7A1FFCEA1BD7E9E800FD092F /* libv8_libbase.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libv8_libbase.a; path = ../../../../../usr/local/Cellar/v8/4.5.103.35/lib/libv8_libbase.a; sourceTree = "<group>"; };
@@ -46,6 +44,8 @@
 		7A1FFD801BD90CC000FD092F /* libwkhtmltox.0.12.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libwkhtmltox.0.12.2.dylib; path = ../../../../../usr/local/lib/libwkhtmltox.0.12.2.dylib; sourceTree = "<group>"; };
 		7A1FFD831BD9358D00FD092F /* libboost_filesystem.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_filesystem.dylib; path = ../../../../../usr/local/Cellar/boost/1.58.0/lib/libboost_filesystem.dylib; sourceTree = "<group>"; };
 		7A1FFD851BD9363300FD092F /* libboost_system.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_system.dylib; path = ../../../../../usr/local/Cellar/boost/1.58.0/lib/libboost_system.dylib; sourceTree = "<group>"; };
+		7A1FFD871BD9ADC100FD092F /* latex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = latex.cpp; sourceTree = "<group>"; };
+		7A1FFD881BD9ADC100FD092F /* latex.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = latex.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,8 +80,8 @@
 				7A1FFCEA1BD7E9E800FD092F /* libv8_libbase.a */,
 				7A1FFCEB1BD7E9E800FD092F /* libv8_libplatform.a */,
 				7A1FFCE71BD7E82E00FD092F /* libv8.dylib */,
-				7A1FFCE21BD7E70500FD092F /* include */,
-				7A1FFCE31BD7E70500FD092F /* source */,
+				7A1FFD881BD9ADC100FD092F /* latex.hpp */,
+				7A1FFD871BD9ADC100FD092F /* latex.cpp */,
 				7A1FFCDE1BD7E6BD00FD092F /* main.cpp */,
 				7A1FFCD51BD7E69900FD092F /* Products */,
 			);
@@ -93,22 +93,6 @@
 				7A1FFCD41BD7E69900FD092F /* latexpp */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		7A1FFCE21BD7E70500FD092F /* include */ = {
-			isa = PBXGroup;
-			children = (
-				7A1FFCE61BD7E71000FD092F /* latex.hpp */,
-			);
-			path = include;
-			sourceTree = "<group>";
-		};
-		7A1FFCE31BD7E70500FD092F /* source */ = {
-			isa = PBXGroup;
-			children = (
-				7A1FFCE41BD7E70500FD092F /* latex.cpp */,
-			);
-			path = source;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -167,7 +151,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7A1FFCE51BD7E70500FD092F /* latex.cpp in Sources */,
+				7A1FFD891BD9ADC100FD092F /* latex.cpp in Sources */,
 				7A1FFCDF1BD7E6BD00FD092F /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -7,15 +7,37 @@
 #include <libplatform/libplatform.h>
 #include <wkhtmltox/image.h>
 
+std::string Latex::_find_katex_path()
+{
+	// Starting point for the walk
+	boost::filesystem::path start("../../");
+	
+	// Iterate over the directory recursively, looking for the katex directory
+	for (const auto& file : boost::filesystem::directory_iterator(start))
+	{
+		auto path = file.path();
+		
+		if (path.stem() == "katex" && is_directory(path))
+		{
+			return path.string();
+		}
+	}
+	
+	// We don't need the CSS necessarily, but do need the JavaScript.
+	throw std::runtime_error("Could not find KaTeX directory!");
+}
+
+const std::string Latex::_katex_path = _find_katex_path();
+
 Latex::V8 Latex::v8;
 
 Latex::Latex(WarningBehavior behavior)
 : Latex("../../katex/katex.min.css", behavior)
 { }
 
-Latex::Latex(const std::string& stylesheet, WarningBehavior behavior)
-: _stylesheet_path(stylesheet)
-, _stylesheet(_read_stylesheet(stylesheet))
+Latex::Latex(const std::string& stylesheet_path, WarningBehavior behavior)
+: _stylesheet_path(stylesheet_path)
+, _stylesheet(_read_stylesheet(stylesheet_path))
 , _warning_behaviour(behavior)
 , _isolate(_new_isolate())
 {
@@ -178,14 +200,26 @@ void Latex::clear_additional_css()
 
 const std::string& Latex::stylesheet() const
 {
-	return _stylesheet_path;
+	return _stylesheet;
 }
 
 void Latex::stylesheet(const std::string& stylesheet)
 {
-	_stylesheet_path = stylesheet;
+	_stylesheet_path.clear();
 	
-	_stylesheet = _read_stylesheet(stylesheet);
+	_stylesheet = stylesheet;
+}
+
+const std::string& Latex::stylesheet_path() const
+{
+	return _stylesheet_path;
+}
+
+void Latex::stylesheet_path(const std::string& path)
+{
+	_stylesheet = _read_stylesheet(path);
+	
+	_stylesheet_path = path;
 }
 
 const Latex::WarningBehavior& Latex::warning_behavior() const
