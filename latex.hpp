@@ -329,8 +329,9 @@ public:
 	*	@details The idea is that you have one base-stylesheet, most likely
 	*			 the one provided by KaTeX, but you can cascade (smaller)
 	*			 bits of CSS to, for example, only change the font-color.
+    *		     Use the `.latex` class for the CSS.
 	*
-	*	@example `add_css("span { color: red; }")`
+	*	@example `add_css(".late { color: red; }")`
 	*
 	*	@param css The additioanal CSS to add to the base-stylesheet.
 	*
@@ -488,7 +489,7 @@ protected:
 	*			 V8 context, such that subsequent code executed in that
 	*			 environment can access the KaTeX library.
 	*
-	*	@param	A V8 context object.
+	*	@param	context A V8 context object.
 	*
 	***************************************************************************/
 	
