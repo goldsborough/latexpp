@@ -125,11 +125,6 @@ xcuserdata
 *.moved-aside
 *.xcuserstate
 
-## Images
-*.png
-*.jpg
-*.svg
-
 ## Docs
 html/
 latex/
