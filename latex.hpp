@@ -79,6 +79,22 @@ public:
 		: std::runtime_error(what)
 		{ }
 	};
+	
+	/***********************************************************************//*!
+	*
+	*	@brief An exception signifying that Latex cannot function correctly.
+	*
+    *   @details More specifically, this exception will be thrown if essential
+    *			 dependency-paths (for KaTeX) were not found on start-up.
+    *
+	***************************************************************************/
+	
+	struct ExistentialException : public std::runtime_error
+	{
+		ExistentialException(const std::string& what)
+		: std::runtime_error(what)
+		{ }
+	};
 
 	/***********************************************************************//*!
 	*
@@ -417,7 +433,9 @@ protected:
 	*
 	*	@brief Attempts to find the KaTeX directory.
 	*
-	*	@throws ExistentialException if the 
+    *   @details Starts at the currentd directory and goes up a maximum of two.
+    *
+	*	@throws ExistentialException if the KaTeX directory was not found.
 	*
 	***************************************************************************/
 	

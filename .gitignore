@@ -124,4 +124,6 @@ xcuserdata
 *.xccheckout
 *.moved-aside
 *.xcuserstate
-
+*.png
+*.jpg
+*.svg

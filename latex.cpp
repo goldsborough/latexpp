@@ -9,22 +9,21 @@
 
 std::string Latex::_find_katex_path()
 {
-	// Starting point for the walk
-	boost::filesystem::path start("../../");
-	
-	// Iterate over the directory recursively, looking for the katex directory
-	for (const auto& file : boost::filesystem::directory_iterator(start))
+	for (std::string dir = "./", end = "../../../"; dir != end; dir += "../")
 	{
-		auto path = file.path();
-		
-		if (path.stem() == "katex" && is_directory(path))
+		for (const auto& file : boost::filesystem::directory_iterator(dir))
 		{
-			return path.string();
+			auto path = file.path();
+			
+			if (path.stem() == "katex" && boost::filesystem::is_directory(path))
+			{
+				return path.string();
+			}
 		}
 	}
 	
 	// We don't need the CSS necessarily, but do need the JavaScript.
-	throw std::runtime_error("Could not find KaTeX directory!");
+	throw ExistentialException("Could not find KaTeX directory!");
 }
 
 const std::string Latex::_katex_path = _find_katex_path();
