@@ -450,7 +450,7 @@ protected:
 		/* The static and unique platform for the V8 engine. */
 		std::unique_ptr<v8::Platform> platform;
 		
-	} v8;
+	} _v8;
 	
 	/***********************************************************************//*!
 	*

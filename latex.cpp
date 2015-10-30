@@ -28,7 +28,7 @@ std::string Latex::_find_katex_path()
 
 std::string Latex::_katex_path;
 
-Latex::V8 Latex::v8;
+Latex::V8 Latex::_v8;
 
 Latex::Latex(WarningBehavior behavior)
 : Latex("../../katex/katex.min.css", behavior)
@@ -248,7 +248,7 @@ v8::Isolate* Latex::_new_isolate() const
 
 void Latex::_load_katex(const v8::Local<v8::Context>& context) const
 {
-	std::ifstream file("../../katex/katex.min.js");
+	std::ifstream file(_katex_path + "/katex.min.js");
 	
 	std::string source;
 	std::string input;
