@@ -14,7 +14,7 @@ int main(int argc, const char* argv[])
 	// Single class
 	Latex latex;
 
-	const std::string equation = "\\sum_{i=1}^{N} i = \\frac{n(n + 1)}{2}";
+	const std::string equation = "\\sum_{i=1}^{n} i = \\frac{n(n + 1)}{2}";
 
 	// Convert to PNG, store in 'equation.png'
 	latex.to_png(equation, "equation.png");
