@@ -360,7 +360,7 @@ Latex::_new_converter_settings(const std::string& filepath,
 	wkhtmltoimage_set_global_setting(settings,
 									 "out",
 									 filepath.c_str());
-	const char* fmt;
+	const char* fmt{ "png" };
 	
 	switch (format)
 	{
