@@ -9,7 +9,7 @@
 
 std::string Latex::_find_katex_path()
 {
-	for (std::string dir = "./", end = "../../../"; dir != end; dir += "../")
+	for (std::string dir = "./", end = "./../../"; dir != end; dir += "../")
 	{
 		for (const auto& file : boost::filesystem::directory_iterator(dir))
 		{
