@@ -9,7 +9,7 @@
 
 std::string Latex::_find_katex_path()
 {
-	for (std::string dir = "./", end = "../../../"; dir != end; dir += "../")
+	for (std::string dir = "./", end = "./../../"; dir != end; dir += "../")
 	{
 		for (const auto& file : boost::filesystem::directory_iterator(dir))
 		{
@@ -360,7 +360,7 @@ Latex::_new_converter_settings(const std::string& filepath,
 	wkhtmltoimage_set_global_setting(settings,
 									 "out",
 									 filepath.c_str());
-	const char* fmt;
+	const char* fmt{ "png" };
 	
 	switch (format)
 	{
